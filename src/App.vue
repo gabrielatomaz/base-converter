@@ -83,7 +83,7 @@ export default {
 
   computed: {
     calculateIsDisabled() {
-      return (!this.base && !this.number)
+      return !this.base || !this.number
     },
 
     numbers() {
