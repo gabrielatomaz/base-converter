@@ -88,10 +88,10 @@ export default {
 
     numbers() {
       if (this.number.includes(',')) {
-        const [left, right] = this.number.split(',')
+        const [left, right] = this.number.trim().split(',')
 
         return {
-          int: this.number,
+          int: this.number.trim(),
           float: {
             left: left.split(''),
             right: right.split(''),
@@ -99,7 +99,7 @@ export default {
         }
       }
       
-      return { int: this.number.split('') }
+      return { int: this.number.trim().split('') }
     },
 
     hexValues() {
