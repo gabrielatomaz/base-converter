@@ -16,9 +16,15 @@
           </div>
           <div class="column">
             Base: 16 <br />
-            Hex number: 1AB <br />
-            Decimal result: 427 <br />
+            Hex number: 1A,B <br />
             Equation: 1x16^2 + 10x16^1 + 11x16^0 <br />
+            Decimal result: 427 <br />
+            <br />
+            <br />
+            Base: 16 <br />
+            Hex number: 1AB <br />
+            Equation: 1x16^1 + 10x16^0 + 11x1/(16^1) <br />
+            Decimal result: 26.6875 <br />
           </div>
         </div>
       </Banner>
@@ -69,7 +75,6 @@ export default {
     return {
       base: '',
       number: '',
-      floatNumber: {},
       result: 0,
       equation: '',
       calcAgain: false,
@@ -82,11 +87,19 @@ export default {
     },
 
     numbers() {
-      return this.number.includes(',') 
-      ? { 
-        numbers: this.number.split(','),
-        float: true,
-      } : this.number.split('')
+      if (this.number.includes(',')) {
+        const [left, right] = this.number.split(',')
+
+        return {
+          int: this.number,
+          float: {
+            left: left.split(''),
+            right: right.split(''),
+          }
+        }
+      }
+      
+      return { int: this.number.split('') }
     },
 
     hexValues() {
@@ -103,11 +116,16 @@ export default {
 
   methods: {
     calculate() {
-      if (BASE_HEX) this.updateNumbersToHex(this.numbers.float)
+      const { float, int } = this.numbers
 
-      if (this.numbers.float) this.setFloatNumbers()
-      else this.converter(this.numbers)
+      if (BASE_HEX && float) {
+        this.updateNumbersToHex('float.left')
+        this.updateNumbersToHex('float.right')
+      } else if (BASE_HEX) this.updateNumbersToHex('int') 
 
+      this.converter(float ? float.left : int)
+      if (float) this.converterFloat(this.numbers.float.right)
+        
       this.calcAgain = true
     },
 
@@ -120,7 +138,7 @@ export default {
       return exponentials
     },
     
-    converter(numbers, isFloat = false) {
+    converter(numbers) {
       for (let i = 0; i < numbers.length; i++) {
         const { power, exponent } = this.exponentials(numbers)[i]
         const number = numbers[i]
@@ -129,18 +147,21 @@ export default {
         this.equation += `${number}x${this.base}^${exponent}`
         
         if (i < numbers.length - 1) this.equation += ' + '
-        else if (!isFloat && i === numbers.length) this.equation += ` = ${this.result}`
       }
     },
 
-    updateNumbersToHex() {
-      for (let i = 0; i < this.numbers.length; i++) {
-        let number = this.numbers[i].toUpperCase()
+    updateNumbersToHex(type) {
+      const numbers = this.deepGet(this.numbers, type)
+      for (let i = 0; i < numbers.length; i++) {
+        let number = numbers[i].toUpperCase()
         const hasHexValue = Object
           .entries(this.hexValues)
           .find(([key]) => key === number)
         
-        if (hasHexValue) this.numbers[i] = this.hexValues[number]
+        if (hasHexValue && type.includes('float')) {
+          const [float, side] = type.split('.')
+          this.numbers[float][side][i] = this.hexValues[number]
+        } else if (hasHexValue) this.numbers[type][i] = this.hexValues[number]
       }
     },
 
@@ -149,11 +170,10 @@ export default {
       for (let i = 0; i < numbers.length; i++) {
         const number = numbers[i]
 
-        this.result += parseInt(number) * 1/Math.pow(this.base, i+1) 
-        this.equation += `${number}x1/(${this.base}^${i})`
+        this.result += parseInt(number) * 1/Math.pow(this.base, i + 1) 
+        this.equation += `${number}x1/(${this.base}^${i + 1})`
 
         if (i < numbers.length - 1) this.equation += ' + '
-        else this.equation += ` = ${this.result}`
       }
     },
 
@@ -165,15 +185,12 @@ export default {
       this.calcAgain = false
     },
 
-    setFloatNumbers() {
-      let { numbers: [leftNumbers, rightNumbers] } = this.numbers
-      this.floatNumber = { 
-        leftNumbers: leftNumbers.split(''),
-        rightNumbers: rightNumbers.split('')
-      }
-    
-      this.converter(this.floatNumber.leftNumbers, true)
-      this.converterFloat(this.floatNumber.rightNumbers)
+    deepGet(obj, paths) {
+      let current = obj; 
+      
+      paths.split('.').forEach(function(path){ current = current[path]; })
+
+      return current
     }
   }
 }
