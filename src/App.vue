@@ -29,7 +29,8 @@
             />
           </div>
           <div class="field-body m-2">
-            <Button :disabled="calculateIsDisabled" text="Calculate" :event="calculate" />
+            <Button :disabled="calculateIsDisabled" text="Calculate" :event="calculate" v-if="!calcAgain"/>
+            <Button text="Calculate Again" :event="clear" v-if="calcAgain" />
           </div>
         </div>
 
@@ -55,10 +56,11 @@ export default {
 
   data() {
     return {
-        base: '',
-        number: '',
-        result: 0,
-        equation: '',
+      base: '',
+      number: '',
+      result: 0,
+      equation: '',
+      calcAgain: false,
     }
   },
 
@@ -97,8 +99,8 @@ export default {
         if (i < this.numbers.length - 1) this.equation += ' + '
         else this.equation += ` = ${this.result}`
       }
-      
-      this.clearValues()
+
+      this.calcAgain = true
     },
 
     exponentials() {
@@ -122,9 +124,12 @@ export default {
       }
     },
 
-    clearValues() {
-      this.number = ''
+    clear() {
       this.base = ''
+      this.number = ''
+      this.result = 0
+      this.equation = ''
+      this.calcAgain = false
     }
   }
 }
