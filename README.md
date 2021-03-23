@@ -1,7 +1,7 @@
 # base-converter
 
 ## Application
-Simple Vue App that convert numbers to decimal.
+Simple Vue App that convert numbers from different bases to decimal.
 
 ## View
 
