@@ -3,28 +3,36 @@
       <Banner title="Examples">
         <div class="columns">
           <div class="column">
-            Base: 2 <br />
-            Binary number: 110 <br />
-            Equation: 0x2^0 + 1x2^1 + 1x2^2 <br />
-            Decimal result: 6
+            <b>Input:</b><br />
+            • Base: 2 <br />
+            • Binary number: 110 <br />
+            <b>Output:</b> <br />
+            • Decimal result: 6 <br />
+            • Equation: 0x2^0 + 1x2^1 + 1x2^2 <br />
             <br />
             <br />
-            Base: 2 <br />
-            Binary number: 11,001 <br />
-            Equation: 1x2^1 + 1x2^0 + 0x1/(2^0) + 0x1/(2^1) + 1x1/(2^2) <br />
-            Decimal result: 3.125
+            <b>Input:</b> <br />
+            • Base: 2 <br />
+            • Binary number: 11,001 <br />
+            <b>Output:</b> <br />
+            • Decimal result: 3.125 <br />
+            • Equation: 1x2^1 + 1x2^0 + 0x2^-1 + 0x2^-2 + 1x2^-3 <br />
           </div>
           <div class="column">
-            Base: 16 <br />
-            Hex number: 1A,B <br />
-            Equation: 1x16^2 + 10x16^1 + 11x16^0 <br />
-            Decimal result: 427 <br />
+            <b>Input:</b> <br />
+            • Base: 16 <br />
+            • Hex number: 1A,B <br />
+            <b>Output:</b> <br />
+            • Decimal result: 26.6875 <br />
+            • Equation: 1x16^1 + 10x16^0 + 11x16^-1 <br />
             <br />
             <br />
-            Base: 16 <br />
-            Hex number: 1AB <br />
-            Equation: 1x16^1 + 10x16^0 + 11x1/(16^1) <br />
-            Decimal result: 26.6875 <br />
+            <b>Input:</b> <br />
+            • Base: 16 <br />
+            • Hex number: 1AB <br />
+            <b>Output:</b><br />
+            • Decimal result: 427 <br />
+            • Equation: 1x16^2 + 10x16^1 + 11x16^0 <br />
           </div>
         </div>
       </Banner>
@@ -170,8 +178,8 @@ export default {
       for (let i = 0; i < numbers.length; i++) {
         const number = numbers[i]
 
-        this.result += parseInt(number) * 1/Math.pow(this.base, i + 1) 
-        this.equation += `${number}x1/(${this.base}^${i + 1})`
+        this.result += parseInt(number) * Math.pow(this.base, -(i + 1))
+        this.equation += `${number}x${this.base}^-${i + 1}`
 
         if (i < numbers.length - 1) this.equation += ' + '
       }

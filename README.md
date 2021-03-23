@@ -5,7 +5,7 @@ Simple Vue App that convert numbers from different bases to decimal.
 
 ## View
 
-![alt text](https://i.imgur.com/amspqyQ.png)
+![alt text](https://i.imgur.com/ti4YTHE.png)
 
 
 ## Project setup
