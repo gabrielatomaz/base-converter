@@ -5,7 +5,7 @@ Simple Vue App that convert numbers to decimal.
 
 ## View
 
-![alt text](https://i.imgur.com/iIhyOWb.png)
+![alt text](https://i.imgur.com/6o39yxn.png)
 
 
 ## Project setup
