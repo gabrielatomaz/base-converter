@@ -1,15 +1,26 @@
 <template>
   <div id="app" class="mt-5">
       <Banner title="Examples">
-        Base: 2 <br />
-        Binary number: 110 <br />
-        Decimal result: 6 <br />
-        Equation: 0x2^0 + 1x2^1 + 1x2^2 = 6 <br />
-        <br />
-        Base: 16 <br />
-        Hex number: 1AB <br />
-        Decimal result: 427 <br />
-        Equation: 1x16^2 + 10x16^1 + 11x16^0 = 427 <br />
+        <div class="columns">
+          <div class="column">
+            Base: 2 <br />
+            Binary number: 110 <br />
+            Equation: 0x2^0 + 1x2^1 + 1x2^2 <br />
+            Decimal result: 6
+            <br />
+            <br />
+            Base: 2 <br />
+            Binary number: 11,001 <br />
+            Equation: 1x2^1 + 1x2^0 + 0x1/(2^0) + 0x1/(2^1) + 1x1/(2^2) <br />
+            Decimal result: 3.125
+          </div>
+          <div class="column">
+            Base: 16 <br />
+            Hex number: 1AB <br />
+            Decimal result: 427 <br />
+            Equation: 1x16^2 + 10x16^1 + 11x16^0 <br />
+          </div>
+        </div>
       </Banner>
       <div class="columns is-mobile is-centered">
         <div class="column is-half mt-5">
@@ -30,7 +41,7 @@
           </div>
           <div class="field-body m-2">
             <Button :disabled="calculateIsDisabled" text="Calculate" :event="calculate" v-if="!calcAgain"/>
-            <Button text="Calculate Again" :event="clear" v-if="calcAgain" />
+            <Button text="Clear" :event="clear" v-if="calcAgain" />
           </div>
         </div>
 
@@ -58,6 +69,7 @@ export default {
     return {
       base: '',
       number: '',
+      floatNumber: {},
       result: 0,
       equation: '',
       calcAgain: false,
@@ -70,7 +82,11 @@ export default {
     },
 
     numbers() {
-      return this.number.split('')
+      return this.number.includes(',') 
+      ? { 
+        numbers: this.number.split(','),
+        float: true,
+      } : this.number.split('')
     },
 
     hexValues() {
@@ -87,30 +103,34 @@ export default {
 
   methods: {
     calculate() {
-      if (BASE_HEX) this.updateNumbersToHex()
+      if (BASE_HEX) this.updateNumbersToHex(this.numbers.float)
 
-      for (let i = 0; i < this.numbers.length; i++) {
-        const { power, exponent } = this.exponentials()[i]
-        const number = this.numbers[i]
-
-        this.result += parseInt(number) * power
-        this.equation += `${number}x${this.base}^${exponent}`
-        
-        if (i < this.numbers.length - 1) this.equation += ' + '
-        else this.equation += ` = ${this.result}`
-      }
+      if (this.numbers.float) this.setFloatNumbers()
+      else this.converter(this.numbers)
 
       this.calcAgain = true
     },
 
-    exponentials() {
+    exponentials(numbers) {
       const exponentials = []
 
-      for (let i = this.numbers.length - 1; i >= 0; i--) {
+      for (let i = numbers.length - 1; i >= 0; i--)
         exponentials.push({ power: Math.pow(this.base, i), exponent: i })
-      }
   
       return exponentials
+    },
+    
+    converter(numbers, isFloat = false) {
+      for (let i = 0; i < numbers.length; i++) {
+        const { power, exponent } = this.exponentials(numbers)[i]
+        const number = numbers[i]
+
+        this.result += parseInt(number) * power
+        this.equation += `${number}x${this.base}^${exponent}`
+        
+        if (i < numbers.length - 1) this.equation += ' + '
+        else if (!isFloat && i === numbers.length) this.equation += ` = ${this.result}`
+      }
     },
 
     updateNumbersToHex() {
@@ -124,12 +144,36 @@ export default {
       }
     },
 
+    converterFloat(numbers) {
+      this.equation += ' + '
+      for (let i = 0; i < numbers.length; i++) {
+        const number = numbers[i]
+
+        this.result += parseInt(number) * 1/Math.pow(this.base, i+1) 
+        this.equation += `${number}x1/(${this.base}^${i})`
+
+        if (i < numbers.length - 1) this.equation += ' + '
+        else this.equation += ` = ${this.result}`
+      }
+    },
+
     clear() {
       this.base = ''
       this.number = ''
       this.result = 0
       this.equation = ''
       this.calcAgain = false
+    },
+
+    setFloatNumbers() {
+      let { numbers: [leftNumbers, rightNumbers] } = this.numbers
+      this.floatNumber = { 
+        leftNumbers: leftNumbers.split(''),
+        rightNumbers: rightNumbers.split('')
+      }
+    
+      this.converter(this.floatNumber.leftNumbers, true)
+      this.converterFloat(this.floatNumber.rightNumbers)
     }
   }
 }
